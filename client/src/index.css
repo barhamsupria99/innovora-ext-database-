@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(210 25% 7.8431%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(210 25% 7.8431%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(210 25% 7.8431%);
+  --primary: hsl(210 25% 7.8431%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(60 5% 96%);
+  --secondary-foreground: hsl(210 25% 7.8431%);
+  --muted: hsl(60 5% 96%);
+  --muted-foreground: hsl(0 0% 45%);
+  --accent: hsl(60 9% 84%);
+  --accent-foreground: hsl(210 25% 7.8431%);
+  --destructive: hsl(356.3033 90.5579% 54.3137%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(0 0% 89%);
+  --input: hsl(0 0% 89%);
+  --ring: hsl(210 25% 7.8431%);
+  --chart-1: hsl(203.8863 88.2845% 53.1373%);
+  --chart-2: hsl(159.7826 100% 36.0784%);
+  --chart-3: hsl(42.0290 92.8251% 56.2745%);
+  --chart-4: hsl(147.1429 78.5047% 41.9608%);
+  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --warm-beige: hsl(60 9% 96%);
+  --soft-beige: hsl(60 5% 92%);
+  --charcoal: hsl(210 25% 7.8431%);
+  --deep-charcoal: hsl(220 25% 6%);
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: hsl(0 0% 0%);
+  --foreground: hsl(200 6.6667% 91.1765%);
+  --card: hsl(228 9.8039% 10%);
+  --card-foreground: hsl(0 0% 85.0980%);
+  --popover: hsl(0 0% 0%);
+  --popover-foreground: hsl(200 6.6667% 91.1765%);
+  --primary: hsl(200 6.6667% 91.1765%);
+  --primary-foreground: hsl(220 25% 6%);
+  --secondary: hsl(220 25% 6%);
+  --secondary-foreground: hsl(200 6.6667% 91.1765%);
+  --muted: hsl(0 0% 9.4118%);
+  --muted-foreground: hsl(210 3.3898% 46.2745%);
+  --accent: hsl(220 25% 15%);
+  --accent-foreground: hsl(200 6.6667% 91.1765%);
+  --destructive: hsl(356.3033 90.5579% 54.3137%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(210 5.2632% 14.9020%);
+  --input: hsl(207.6923 27.6596% 18.4314%);
+  --ring: hsl(200 6.6667% 91.1765%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+}
+
+@layer utilities {
+  .bg-warm-beige {
+    background-color: hsl(var(--warm-beige));
+  }
+  
+  .bg-soft-beige {
+    background-color: hsl(var(--soft-beige));
+  }
+  
+  .bg-charcoal {
+    background-color: hsl(var(--charcoal));
+  }
+  
+  .bg-deep-charcoal {
+    background-color: hsl(var(--deep-charcoal));
+  }
+  
+  .text-charcoal {
+    color: hsl(var(--charcoal));
+  }
+  
+  .text-deep-charcoal {
+    color: hsl(var(--deep-charcoal));
+  }
+  
+  .border-charcoal {
+    border-color: hsl(var(--charcoal));
+  }
+}
