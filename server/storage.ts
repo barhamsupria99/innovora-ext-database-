@@ -1,5 +1,8 @@
-import { type User, type InsertUser, type Product, type InsertProduct, type Category, type InsertCategory } from "@shared/schema";
+import { type User, type InsertUser, type Product, type InsertProduct, type Category, type InsertCategory, products, categories, users } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { neon } from "@neondatabase/serverless";
+import { eq, like, or } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -223,4 +226,89 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  private db;
+
+  constructor() {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL environment variable is required");
+    }
+    
+    const sql = neon(process.env.DATABASE_URL);
+    this.db = drizzle(sql);
+  }
+
+  async getUser(id: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const result = await this.db.select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const newUser = { ...insertUser, id };
+    await this.db.insert(users).values(newUser);
+    return newUser;
+  }
+
+  async getProducts(): Promise<Product[]> {
+    return await this.db.select().from(products);
+  }
+
+  async getProduct(id: string): Promise<Product | undefined> {
+    const result = await this.db.select().from(products).where(eq(products.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getProductsByCategory(category: string): Promise<Product[]> {
+    return await this.db.select().from(products).where(eq(products.category, category));
+  }
+
+  async createProduct(insertProduct: InsertProduct): Promise<Product> {
+    const id = randomUUID();
+    const newProduct = { 
+      ...insertProduct, 
+      id,
+      inStock: insertProduct.inStock ?? 0,
+      features: insertProduct.features ?? []
+    };
+    await this.db.insert(products).values(newProduct);
+    return newProduct;
+  }
+
+  async searchProducts(query: string): Promise<Product[]> {
+    const searchTerm = `%${query.toLowerCase()}%`;
+    return await this.db.select().from(products).where(
+      or(
+        like(products.name, searchTerm),
+        like(products.description, searchTerm),
+        like(products.category, searchTerm)
+      )
+    );
+  }
+
+  async getCategories(): Promise<Category[]> {
+    return await this.db.select().from(categories);
+  }
+
+  async getCategory(slug: string): Promise<Category | undefined> {
+    const result = await this.db.select().from(categories).where(eq(categories.slug, slug)).limit(1);
+    return result[0];
+  }
+
+  async createCategory(insertCategory: InsertCategory): Promise<Category> {
+    const id = randomUUID();
+    const newCategory = { ...insertCategory, id };
+    await this.db.insert(categories).values(newCategory);
+    return newCategory;
+  }
+}
+
+// Use database storage if DATABASE_URL is available, otherwise fall back to memory storage
+export const storage = process.env.DATABASE_URL 
+  ? new DatabaseStorage() 
+  : new MemStorage();

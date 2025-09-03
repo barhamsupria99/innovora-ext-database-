@@ -4,3 +4,12 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+.env
+.gitignore
+.local/state/replit/agent/rapid_build_success
+.gitignore
+.local/state/replit/agent/.agent_state_1e6bfdafd0138a9bbe3c6acd4168a27ee334ac74.bin
+.local/state/replit/agent/.agent_state_main.bin
+.local/state/replit/agent/rapid_build_started
+.local/state/replit/agent/repl_state.bin
+.local/state/replit/agent/design_reference/2f8532a1-0e0d-45af-a42e-4e9833b74417/38ecebfa-10ff-482a-a3fd-f40af1fc669c.html
