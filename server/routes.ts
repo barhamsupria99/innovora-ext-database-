@@ -4,6 +4,22 @@ import { storage } from "./storage";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check endpoint
+  app.get("/api/health", async (req, res) => {
+    try {
+      res.json({ 
+        status: "healthy", 
+        timestamp: new Date().toISOString(),
+        database: process.env.DATABASE_URL ? "connected" : "not configured"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        status: "unhealthy", 
+        error: error instanceof Error ? error.message : "Unknown error" 
+      });
+    }
+  });
+
   // Get all products
   app.get("/api/products", async (req, res) => {
     try {

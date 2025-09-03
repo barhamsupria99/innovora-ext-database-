@@ -3,6 +3,10 @@ import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { neon } from "@neondatabase/serverless";
 import { eq, like, or } from "drizzle-orm";
+import { config } from "dotenv";
+
+// Load environment variables
+config();
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -234,8 +238,17 @@ export class DatabaseStorage implements IStorage {
       throw new Error("DATABASE_URL environment variable is required");
     }
     
-    const sql = neon(process.env.DATABASE_URL);
-    this.db = drizzle(sql);
+    try {
+      console.log("🔌 Initializing database connection...");
+      console.log("DATABASE_URL:", process.env.DATABASE_URL ? "✅ Set" : "❌ Not set");
+      
+      const sql = neon(process.env.DATABASE_URL);
+      this.db = drizzle(sql);
+      console.log("✅ Database connection initialized successfully");
+    } catch (error) {
+      console.error("❌ Failed to initialize database connection:", error);
+      throw error;
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -256,7 +269,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProducts(): Promise<Product[]> {
-    return await this.db.select().from(products);
+    try {
+      console.log("🔍 Fetching products from database...");
+      
+      // First try with Drizzle ORM
+      try {
+        const result = await this.db.select().from(products);
+        console.log(`✅ Successfully fetched ${result.length} products with Drizzle`);
+        return result;
+      } catch (drizzleError) {
+        console.log("⚠️ Drizzle query failed, trying raw SQL...");
+        console.error("Drizzle error:", drizzleError);
+        
+        // Fallback to raw SQL
+        const sql = neon(process.env.DATABASE_URL!);
+        const result = await sql`SELECT * FROM products`;
+        console.log(`✅ Successfully fetched ${result.length} products with raw SQL`);
+        return result as Product[];
+      }
+    } catch (error) {
+      console.error("❌ Error fetching products:", error);
+      throw new Error(`Failed to fetch products: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   async getProduct(id: string): Promise<Product | undefined> {
@@ -292,7 +326,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCategories(): Promise<Category[]> {
-    return await this.db.select().from(categories);
+    try {
+      console.log("🔍 Fetching categories from database...");
+      
+      // First try with Drizzle ORM
+      try {
+        const result = await this.db.select().from(categories);
+        console.log(`✅ Successfully fetched ${result.length} categories with Drizzle`);
+        return result;
+      } catch (drizzleError) {
+        console.log("⚠️ Drizzle query failed, trying raw SQL...");
+        console.error("Drizzle error:", drizzleError);
+        
+        // Fallback to raw SQL
+        const sql = neon(process.env.DATABASE_URL!);
+        const result = await sql`SELECT * FROM categories`;
+        console.log(`✅ Successfully fetched ${result.length} categories with raw SQL`);
+        return result as Category[];
+      }
+    } catch (error) {
+      console.error("❌ Error fetching categories:", error);
+      throw new Error(`Failed to fetch categories: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   async getCategory(slug: string): Promise<Category | undefined> {
