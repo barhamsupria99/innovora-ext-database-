@@ -55,6 +55,23 @@ export const aboutSection = pgTable("about_section", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   image: text("image").notNull(),
+  // Mission Section
+  missionTitle: text("mission_title").default("Our Mission"),
+  missionContent: text("mission_content").default(""),
+  missionImage: text("mission_image").default(""),
+  // Story Section
+  storyTitle: text("story_title").default("Our Story"),
+  storyContent: text("story_content").default(""),
+  // Values Section
+  valuesTitle: text("values_title").default("Our Values"),
+  valuesSubtitle: text("values_subtitle").default("The principles that guide everything we do at Innovora"),
+  // Stats Section
+  statsTitle: text("stats_title").default("Our Impact"),
+  statsSubtitle: text("stats_subtitle").default("Numbers that reflect our commitment to excellence and customer satisfaction"),
+  statsCustomers: text("stats_customers").default("10,000+"),
+  statsProducts: text("stats_products").default("500+"),
+  statsCountries: text("stats_countries").default("25+"),
+  statsSatisfaction: text("stats_satisfaction").default("99%"),
   updatedAt: text("updated_at").notNull().default(sql`now()`),
 });
 

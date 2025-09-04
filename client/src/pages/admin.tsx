@@ -71,7 +71,24 @@ const AdminPage = () => {
   const [aboutFormData, setAboutFormData] = useState({
     title: "",
     description: "",
-    image: ""
+    image: "",
+    // Mission Section
+    missionTitle: "Our Mission",
+    missionContent: "",
+    missionImage: "",
+    // Story Section
+    storyTitle: "Our Story",
+    storyContent: "",
+    // Values Section
+    valuesTitle: "Our Values",
+    valuesSubtitle: "The principles that guide everything we do at Innovora",
+    // Stats Section
+    statsTitle: "Our Impact",
+    statsSubtitle: "Numbers that reflect our commitment to excellence and customer satisfaction",
+    statsCustomers: "10,000+",
+    statsProducts: "500+",
+    statsCountries: "25+",
+    statsSatisfaction: "99%"
   });
 
   const [categoryFormData, setCategoryFormData] = useState({
@@ -139,7 +156,24 @@ const AdminPage = () => {
           setAboutFormData({
             title: aboutData.title,
             description: aboutData.description,
-            image: aboutData.image
+            image: aboutData.image,
+            // Mission Section
+            missionTitle: aboutData.missionTitle || "Our Mission",
+            missionContent: aboutData.missionContent || "",
+            missionImage: aboutData.missionImage || "",
+            // Story Section
+            storyTitle: aboutData.storyTitle || "Our Story",
+            storyContent: aboutData.storyContent || "",
+            // Values Section
+            valuesTitle: aboutData.valuesTitle || "Our Values",
+            valuesSubtitle: aboutData.valuesSubtitle || "The principles that guide everything we do at Innovora",
+            // Stats Section
+            statsTitle: aboutData.statsTitle || "Our Impact",
+            statsSubtitle: aboutData.statsSubtitle || "Numbers that reflect our commitment to excellence and customer satisfaction",
+            statsCustomers: aboutData.statsCustomers || "10,000+",
+            statsProducts: aboutData.statsProducts || "500+",
+            statsCountries: aboutData.statsCountries || "25+",
+            statsSatisfaction: aboutData.statsSatisfaction || "99%"
           });
         }
       }
@@ -779,45 +813,203 @@ const AdminPage = () => {
           <TabsContent value="about" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>About Section Management</CardTitle>
+                <CardTitle>About Page Customization</CardTitle>
                 <CardDescription>
-                  Update the about section content and image
+                  Customize all sections of your about page
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label htmlFor="about-title">Title</Label>
-                  <Input
-                    id="about-title"
-                    value={aboutFormData.title}
-                    onChange={(e) => setAboutFormData({ ...aboutFormData, title: e.target.value })}
-                    placeholder="Enter about section title"
-                  />
-                </div>
+              <CardContent>
+                <Tabs defaultValue="hero" className="space-y-6">
+                  <TabsList className="grid w-full grid-cols-5">
+                    <TabsTrigger value="hero">Hero</TabsTrigger>
+                    <TabsTrigger value="mission">Mission</TabsTrigger>
+                    <TabsTrigger value="story">Story</TabsTrigger>
+                    <TabsTrigger value="values">Values</TabsTrigger>
+                    <TabsTrigger value="stats">Stats</TabsTrigger>
+                  </TabsList>
+
+                  {/* Hero Section */}
+                  <TabsContent value="hero" className="space-y-6">
+                    <div>
+                      <Label htmlFor="about-title">Hero Title</Label>
+                      <Input
+                        id="about-title"
+                        value={aboutFormData.title}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, title: e.target.value })}
+                        placeholder="Enter hero title"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="about-description">Hero Description</Label>
+                      <Textarea
+                        id="about-description"
+                        value={aboutFormData.description}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, description: e.target.value })}
+                        placeholder="Enter hero description"
+                        rows={4}
+                      />
+                    </div>
+                    
+                    <div>
+                      <ImageUpload
+                        value={aboutFormData.image}
+                        onChange={(url) => setAboutFormData({ ...aboutFormData, image: url })}
+                        folder="about"
+                        label="Hero Background Image"
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* Mission Section */}
+                  <TabsContent value="mission" className="space-y-6">
+                    <div>
+                      <Label htmlFor="mission-title">Mission Title</Label>
+                      <Input
+                        id="mission-title"
+                        value={aboutFormData.missionTitle}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, missionTitle: e.target.value })}
+                        placeholder="Enter mission title"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="mission-content">Mission Content</Label>
+                      <Textarea
+                        id="mission-content"
+                        value={aboutFormData.missionContent}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, missionContent: e.target.value })}
+                        placeholder="Enter mission content"
+                        rows={8}
+                      />
+                    </div>
+                    
+                    <div>
+                      <ImageUpload
+                        value={aboutFormData.missionImage}
+                        onChange={(url) => setAboutFormData({ ...aboutFormData, missionImage: url })}
+                        folder="about"
+                        label="Mission Section Image"
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* Story Section */}
+                  <TabsContent value="story" className="space-y-6">
+                    <div>
+                      <Label htmlFor="story-title">Story Title</Label>
+                      <Input
+                        id="story-title"
+                        value={aboutFormData.storyTitle}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, storyTitle: e.target.value })}
+                        placeholder="Enter story title"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="story-content">Story Content</Label>
+                      <Textarea
+                        id="story-content"
+                        value={aboutFormData.storyContent}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, storyContent: e.target.value })}
+                        placeholder="Enter story content"
+                        rows={12}
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* Values Section */}
+                  <TabsContent value="values" className="space-y-6">
+                    <div>
+                      <Label htmlFor="values-title">Values Title</Label>
+                      <Input
+                        id="values-title"
+                        value={aboutFormData.valuesTitle}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, valuesTitle: e.target.value })}
+                        placeholder="Enter values title"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="values-subtitle">Values Subtitle</Label>
+                      <Input
+                        id="values-subtitle"
+                        value={aboutFormData.valuesSubtitle}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, valuesSubtitle: e.target.value })}
+                        placeholder="Enter values subtitle"
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* Stats Section */}
+                  <TabsContent value="stats" className="space-y-6">
+                    <div>
+                      <Label htmlFor="stats-title">Stats Title</Label>
+                      <Input
+                        id="stats-title"
+                        value={aboutFormData.statsTitle}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, statsTitle: e.target.value })}
+                        placeholder="Enter stats title"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="stats-subtitle">Stats Subtitle</Label>
+                      <Input
+                        id="stats-subtitle"
+                        value={aboutFormData.statsSubtitle}
+                        onChange={(e) => setAboutFormData({ ...aboutFormData, statsSubtitle: e.target.value })}
+                        placeholder="Enter stats subtitle"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="stats-customers">Happy Customers</Label>
+                        <Input
+                          id="stats-customers"
+                          value={aboutFormData.statsCustomers}
+                          onChange={(e) => setAboutFormData({ ...aboutFormData, statsCustomers: e.target.value })}
+                          placeholder="e.g., 10,000+"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="stats-products">Premium Products</Label>
+                        <Input
+                          id="stats-products"
+                          value={aboutFormData.statsProducts}
+                          onChange={(e) => setAboutFormData({ ...aboutFormData, statsProducts: e.target.value })}
+                          placeholder="e.g., 500+"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="stats-countries">Countries Served</Label>
+                        <Input
+                          id="stats-countries"
+                          value={aboutFormData.statsCountries}
+                          onChange={(e) => setAboutFormData({ ...aboutFormData, statsCountries: e.target.value })}
+                          placeholder="e.g., 25+"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="stats-satisfaction">Customer Satisfaction</Label>
+                        <Input
+                          id="stats-satisfaction"
+                          value={aboutFormData.statsSatisfaction}
+                          onChange={(e) => setAboutFormData({ ...aboutFormData, statsSatisfaction: e.target.value })}
+                          placeholder="e.g., 99%"
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
                 
-                <div>
-                  <Label htmlFor="about-description">Description</Label>
-                  <Textarea
-                    id="about-description"
-                    value={aboutFormData.description}
-                    onChange={(e) => setAboutFormData({ ...aboutFormData, description: e.target.value })}
-                    placeholder="Enter about section description"
-                    rows={6}
-                  />
-                </div>
-                
-                <div>
-                  <ImageUpload
-                    value={aboutFormData.image}
-                    onChange={(url) => setAboutFormData({ ...aboutFormData, image: url })}
-                    folder="about"
-                    label="About Section Image"
-                  />
-                </div>
-                
-                <div className="flex justify-end">
+                <div className="flex justify-end mt-6">
                   <Button onClick={handleUpdateAbout} className="bg-blue-600 hover:bg-blue-700">
-                    Update About Section
+                    Update About Page
                   </Button>
                 </div>
               </CardContent>

@@ -294,6 +294,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         title: z.string().min(1, "Title is required"),
         description: z.string().min(1, "Description is required"),
         image: z.string().url("Valid image URL is required"),
+        // Mission Section
+        missionTitle: z.string().optional(),
+        missionContent: z.string().optional(),
+        missionImage: z.string().optional(),
+        // Story Section
+        storyTitle: z.string().optional(),
+        storyContent: z.string().optional(),
+        // Values Section
+        valuesTitle: z.string().optional(),
+        valuesSubtitle: z.string().optional(),
+        // Stats Section
+        statsTitle: z.string().optional(),
+        statsSubtitle: z.string().optional(),
+        statsCustomers: z.string().optional(),
+        statsProducts: z.string().optional(),
+        statsCountries: z.string().optional(),
+        statsSatisfaction: z.string().optional(),
       });
       
       const aboutData = aboutSchema.parse(req.body);
