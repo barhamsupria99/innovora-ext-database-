@@ -76,7 +76,12 @@ export class MemStorage implements IStorage {
     ];
 
     categoriesData.forEach(cat => {
-      const category: Category = { ...cat, id: randomUUID() };
+      const category: Category = { 
+        ...cat, 
+        id: randomUUID(),
+        description: cat.description || null,
+        image: cat.image || null
+      };
       this.categories.set(category.id, category);
     });
 
@@ -254,7 +259,12 @@ export class MemStorage implements IStorage {
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const id = randomUUID();
-    const category: Category = { ...insertCategory, id };
+    const category: Category = { 
+      ...insertCategory, 
+      id,
+      description: insertCategory.description || null,
+      image: insertCategory.image || null
+    };
     this.categories.set(id, category);
     return category;
   }
@@ -292,9 +302,7 @@ export class DatabaseStorage implements IStorage {
       this.sql = neon(process.env.DATABASE_URL);
       
       // Initialize Drizzle with proper configuration
-      this.db = drizzle(this.sql, {
-        schema: { products, categories, aboutSection }
-      });
+      this.db = drizzle(this.sql as any);
       
       console.log("✅ Database connection initialized successfully");
     } catch (error) {
@@ -484,10 +492,45 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
-    const id = randomUUID();
-    const newCategory = { ...insertCategory, id };
-    await this.db.insert(categories).values(newCategory);
-    return newCategory;
+    try {
+      const id = randomUUID();
+      const newCategory = { 
+        ...insertCategory, 
+        id,
+        description: insertCategory.description || null,
+        image: insertCategory.image || null
+      };
+      console.log("Creating category with data:", newCategory);
+      
+      try {
+        // Try with Drizzle ORM first
+        await this.db.insert(categories).values(newCategory);
+        console.log("Category created successfully with Drizzle");
+        return newCategory;
+      } catch (drizzleError) {
+        console.log("Drizzle failed, falling back to raw SQL:", drizzleError);
+        // Fallback to raw SQL
+        const query = `
+          INSERT INTO categories (id, name, slug, description, image)
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING *
+        `;
+        
+        const result = await this.sql(query, [
+          newCategory.id,
+          newCategory.name,
+          newCategory.slug,
+          newCategory.description,
+          newCategory.image
+        ]);
+        
+        console.log("Category created successfully with raw SQL:", result[0]);
+        return result[0] as Category;
+      }
+    } catch (error) {
+      console.error("Error creating category:", error);
+      throw error;
+    }
   }
 
   async getAboutSection(): Promise<AboutSection | undefined> {
@@ -563,6 +606,18 @@ export class DatabaseStorage implements IStorage {
 }
 
 // Use database storage if DATABASE_URL is available, otherwise fall back to memory storage
-export const storage = process.env.DATABASE_URL 
-  ? new DatabaseStorage() 
-  : new MemStorage();
+let storage: IStorage;
+try {
+  if (process.env.DATABASE_URL) {
+    console.log("🗄️ Using database storage");
+    storage = new DatabaseStorage();
+  } else {
+    console.log("💾 Using in-memory storage (no DATABASE_URL found)");
+    storage = new MemStorage();
+  }
+} catch (error) {
+  console.error("❌ Failed to initialize database storage, falling back to memory storage:", error);
+  storage = new MemStorage();
+}
+
+export { storage };

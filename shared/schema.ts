@@ -25,8 +25,8 @@ export const categories = pgTable("categories", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
-  description: text("description").notNull(),
-  image: text("image").notNull(),
+  description: text("description").default(""),
+  image: text("image").default(""),
 });
 
 export const insertCategorySchema = createInsertSchema(categories).omit({
