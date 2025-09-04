@@ -49,3 +49,19 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+export const aboutSection = pgTable("about_section", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  image: text("image").notNull(),
+  updatedAt: text("updated_at").notNull().default(sql`now()`),
+});
+
+export const insertAboutSectionSchema = createInsertSchema(aboutSection).omit({
+  id: true,
+  updatedAt: true,
+});
+
+export type InsertAboutSection = z.infer<typeof insertAboutSectionSchema>;
+export type AboutSection = typeof aboutSection.$inferSelect;
