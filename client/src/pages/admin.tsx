@@ -158,22 +158,22 @@ const AdminPage = () => {
             description: aboutData.description,
             image: aboutData.image,
             // Mission Section
-            missionTitle: aboutData.missionTitle || "Our Mission",
-            missionContent: aboutData.missionContent || "",
-            missionImage: aboutData.missionImage || "",
+            missionTitle: aboutData.mission_title || "Our Mission",
+            missionContent: aboutData.mission_content || "",
+            missionImage: aboutData.mission_image || "",
             // Story Section
-            storyTitle: aboutData.storyTitle || "Our Story",
-            storyContent: aboutData.storyContent || "",
+            storyTitle: aboutData.story_title || "Our Story",
+            storyContent: aboutData.story_content || "",
             // Values Section
-            valuesTitle: aboutData.valuesTitle || "Our Values",
-            valuesSubtitle: aboutData.valuesSubtitle || "The principles that guide everything we do at Innovora",
+            valuesTitle: aboutData.values_title || "Our Values",
+            valuesSubtitle: aboutData.values_subtitle || "The principles that guide everything we do at Innovora",
             // Stats Section
-            statsTitle: aboutData.statsTitle || "Our Impact",
-            statsSubtitle: aboutData.statsSubtitle || "Numbers that reflect our commitment to excellence and customer satisfaction",
-            statsCustomers: aboutData.statsCustomers || "10,000+",
-            statsProducts: aboutData.statsProducts || "500+",
-            statsCountries: aboutData.statsCountries || "25+",
-            statsSatisfaction: aboutData.statsSatisfaction || "99%"
+            statsTitle: aboutData.stats_title || "Our Impact",
+            statsSubtitle: aboutData.stats_subtitle || "Numbers that reflect our commitment to excellence and customer satisfaction",
+            statsCustomers: aboutData.stats_customers || "10,000+",
+            statsProducts: aboutData.stats_products || "500+",
+            statsCountries: aboutData.stats_countries || "25+",
+            statsSatisfaction: aboutData.stats_satisfaction || "99%"
           });
         }
       }
