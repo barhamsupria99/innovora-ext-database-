@@ -8,22 +8,22 @@ interface AboutSection {
   description: string;
   image: string;
   // Mission Section
-  missionTitle?: string;
-  missionContent?: string;
-  missionImage?: string;
+  mission_title?: string;
+  mission_content?: string;
+  mission_image?: string;
   // Story Section
-  storyTitle?: string;
-  storyContent?: string;
+  story_title?: string;
+  story_content?: string;
   // Values Section
-  valuesTitle?: string;
-  valuesSubtitle?: string;
+  values_title?: string;
+  values_subtitle?: string;
   // Stats Section
-  statsTitle?: string;
-  statsSubtitle?: string;
-  statsCustomers?: string;
-  statsProducts?: string;
-  statsCountries?: string;
-  statsSatisfaction?: string;
+  stats_title?: string;
+  stats_subtitle?: string;
+  stats_customers?: string;
+  stats_products?: string;
+  stats_countries?: string;
+  stats_satisfaction?: string;
   updated_at: string;
 }
 
@@ -84,7 +84,7 @@ export default function About() {
                 </div>
               ) : (
                 <img
-                  src={aboutSection?.missionImage || aboutSection?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"}
+                  src={aboutSection?.mission_image || aboutSection?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"}
                   alt="About Innovora"
                   className="rounded-2xl shadow-lg w-full h-auto"
                   data-testid="img-mission"
@@ -93,11 +93,11 @@ export default function About() {
             </div>
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold text-charcoal">
-                {aboutSection?.missionTitle || "Our Mission"}
+                {aboutSection?.mission_title || "Our Mission"}
               </h2>
-              {aboutSection?.missionContent ? (
+              {aboutSection?.mission_content ? (
                 <div className="text-lg text-gray-600 leading-relaxed whitespace-pre-line">
-                  {aboutSection.missionContent}
+                  {aboutSection.mission_content}
                 </div>
               ) : (
                 <>
@@ -123,10 +123,10 @@ export default function About() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">
-              {aboutSection?.valuesTitle || "Our Values"}
+              {aboutSection?.values_title || "Our Values"}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {aboutSection?.valuesSubtitle || "The principles that guide everything we do at Innovora"}
+              {aboutSection?.values_subtitle || "The principles that guide everything we do at Innovora"}
             </p>
           </div>
 
@@ -187,35 +187,35 @@ export default function About() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">
-              {aboutSection?.statsTitle || "Our Impact"}
+              {aboutSection?.stats_title || "Our Impact"}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {aboutSection?.statsSubtitle || "Numbers that reflect our commitment to excellence and customer satisfaction"}
+              {aboutSection?.stats_subtitle || "Numbers that reflect our commitment to excellence and customer satisfaction"}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-customers">
-                {aboutSection?.statsCustomers || "10,000+"}
+                {aboutSection?.stats_customers || "10,000+"}
               </div>
               <div className="text-gray-600">Happy Customers</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-products">
-                {aboutSection?.statsProducts || "500+"}
+                {aboutSection?.stats_products || "500+"}
               </div>
               <div className="text-gray-600">Premium Products</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-countries">
-                {aboutSection?.statsCountries || "25+"}
+                {aboutSection?.stats_countries || "25+"}
               </div>
               <div className="text-gray-600">Countries Served</div>
             </div>
             <div>
               <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-satisfaction">
-                {aboutSection?.statsSatisfaction || "99%"}
+                {aboutSection?.stats_satisfaction || "99%"}
               </div>
               <div className="text-gray-600">Customer Satisfaction</div>
             </div>
@@ -229,14 +229,14 @@ export default function About() {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-6">
-                {aboutSection?.storyTitle || "Our Story"}
+                {aboutSection?.story_title || "Our Story"}
               </h2>
             </div>
             
             <div className="space-y-8 text-lg text-gray-600 leading-relaxed">
-              {aboutSection?.storyContent ? (
+              {aboutSection?.story_content ? (
                 <div className="whitespace-pre-line">
-                  {aboutSection.storyContent}
+                  {aboutSection.story_content}
                 </div>
               ) : (
                 <>
