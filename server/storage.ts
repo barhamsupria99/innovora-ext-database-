@@ -278,7 +278,20 @@ export class MemStorage implements IStorage {
     const about: AboutSection = { 
       ...insertAbout, 
       id,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      missionTitle: insertAbout.missionTitle || null,
+      missionContent: insertAbout.missionContent || null,
+      missionImage: insertAbout.missionImage || null,
+      storyTitle: insertAbout.storyTitle || null,
+      storyContent: insertAbout.storyContent || null,
+      valuesTitle: insertAbout.valuesTitle || null,
+      valuesSubtitle: insertAbout.valuesSubtitle || null,
+      statsTitle: insertAbout.statsTitle || null,
+      statsSubtitle: insertAbout.statsSubtitle || null,
+      statsCustomers: insertAbout.statsCustomers || null,
+      statsProducts: insertAbout.statsProducts || null,
+      statsCountries: insertAbout.statsCountries || null,
+      statsSatisfaction: insertAbout.statsSatisfaction || null
     };
     this.aboutSection = about;
     return about;
@@ -559,7 +572,20 @@ export class DatabaseStorage implements IStorage {
         const updatedAbout = {
           ...existingAbout,
           ...insertAbout,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          missionTitle: insertAbout.missionTitle || null,
+          missionContent: insertAbout.missionContent || null,
+          missionImage: insertAbout.missionImage || null,
+          storyTitle: insertAbout.storyTitle || null,
+          storyContent: insertAbout.storyContent || null,
+          valuesTitle: insertAbout.valuesTitle || null,
+          valuesSubtitle: insertAbout.valuesSubtitle || null,
+          statsTitle: insertAbout.statsTitle || null,
+          statsSubtitle: insertAbout.statsSubtitle || null,
+          statsCustomers: insertAbout.statsCustomers || null,
+          statsProducts: insertAbout.statsProducts || null,
+          statsCountries: insertAbout.statsCountries || null,
+          statsSatisfaction: insertAbout.statsSatisfaction || null
         };
         
         try {
@@ -571,7 +597,20 @@ export class DatabaseStorage implements IStorage {
             UPDATE about_section 
             SET title = ${updatedAbout.title}, 
                 description = ${updatedAbout.description}, 
-                image = ${updatedAbout.image}, 
+                image = ${updatedAbout.image},
+                mission_title = ${updatedAbout.missionTitle || "Our Mission"},
+                mission_content = ${updatedAbout.missionContent || ""},
+                mission_image = ${updatedAbout.missionImage || ""},
+                story_title = ${updatedAbout.storyTitle || "Our Story"},
+                story_content = ${updatedAbout.storyContent || ""},
+                values_title = ${updatedAbout.valuesTitle || "Our Values"},
+                values_subtitle = ${updatedAbout.valuesSubtitle || "The principles that guide everything we do at Innovora"},
+                stats_title = ${updatedAbout.statsTitle || "Our Impact"},
+                stats_subtitle = ${updatedAbout.statsSubtitle || "Numbers that reflect our commitment to excellence and customer satisfaction"},
+                stats_customers = ${updatedAbout.statsCustomers || "10,000+"},
+                stats_products = ${updatedAbout.statsProducts || "500+"},
+                stats_countries = ${updatedAbout.statsCountries || "25+"},
+                stats_satisfaction = ${updatedAbout.statsSatisfaction || "99%"},
                 updated_at = ${updatedAbout.updatedAt}
             WHERE id = ${updatedAbout.id}
           `;
@@ -584,15 +623,28 @@ export class DatabaseStorage implements IStorage {
         const newAbout = {
           ...insertAbout,
           id,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          missionTitle: insertAbout.missionTitle || null,
+          missionContent: insertAbout.missionContent || null,
+          missionImage: insertAbout.missionImage || null,
+          storyTitle: insertAbout.storyTitle || null,
+          storyContent: insertAbout.storyContent || null,
+          valuesTitle: insertAbout.valuesTitle || null,
+          valuesSubtitle: insertAbout.valuesSubtitle || null,
+          statsTitle: insertAbout.statsTitle || null,
+          statsSubtitle: insertAbout.statsSubtitle || null,
+          statsCustomers: insertAbout.statsCustomers || null,
+          statsProducts: insertAbout.statsProducts || null,
+          statsCountries: insertAbout.statsCountries || null,
+          statsSatisfaction: insertAbout.statsSatisfaction || null
         };
         
         try {
           await this.db.insert(aboutSection).values(newAbout);
         } catch (drizzleError) {
           await this.sql`
-            INSERT INTO about_section (id, title, description, image, updated_at)
-            VALUES (${newAbout.id}, ${newAbout.title}, ${newAbout.description}, ${newAbout.image}, ${newAbout.updatedAt})
+            INSERT INTO about_section (id, title, description, image, mission_title, mission_content, mission_image, story_title, story_content, values_title, values_subtitle, stats_title, stats_subtitle, stats_customers, stats_products, stats_countries, stats_satisfaction, updated_at)
+            VALUES (${newAbout.id}, ${newAbout.title}, ${newAbout.description}, ${newAbout.image}, ${newAbout.missionTitle || "Our Mission"}, ${newAbout.missionContent || ""}, ${newAbout.missionImage || ""}, ${newAbout.storyTitle || "Our Story"}, ${newAbout.storyContent || ""}, ${newAbout.valuesTitle || "Our Values"}, ${newAbout.valuesSubtitle || "The principles that guide everything we do at Innovora"}, ${newAbout.statsTitle || "Our Impact"}, ${newAbout.statsSubtitle || "Numbers that reflect our commitment to excellence and customer satisfaction"}, ${newAbout.statsCustomers || "10,000+"}, ${newAbout.statsProducts || "500+"}, ${newAbout.statsCountries || "25+"}, ${newAbout.statsSatisfaction || "99%"}, ${newAbout.updatedAt})
           `;
         }
         

@@ -7,6 +7,23 @@ interface AboutSection {
   title: string;
   description: string;
   image: string;
+  // Mission Section
+  missionTitle?: string;
+  missionContent?: string;
+  missionImage?: string;
+  // Story Section
+  storyTitle?: string;
+  storyContent?: string;
+  // Values Section
+  valuesTitle?: string;
+  valuesSubtitle?: string;
+  // Stats Section
+  statsTitle?: string;
+  statsSubtitle?: string;
+  statsCustomers?: string;
+  statsProducts?: string;
+  statsCountries?: string;
+  statsSatisfaction?: string;
   updated_at: string;
 }
 
@@ -67,7 +84,7 @@ export default function About() {
                 </div>
               ) : (
                 <img
-                  src={aboutSection?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"}
+                  src={aboutSection?.missionImage || aboutSection?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"}
                   alt="About Innovora"
                   className="rounded-2xl shadow-lg w-full h-auto"
                   data-testid="img-mission"
@@ -75,17 +92,27 @@ export default function About() {
               )}
             </div>
             <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-charcoal">Our Mission</h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                At Innovora, we believe that quality products should be accessible to everyone. Our mission is to 
-                curate and provide premium lifestyle products that enhance daily life while maintaining the highest 
-                standards of quality, sustainability, and customer satisfaction.
-              </p>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                From organic feminine care products to educational toys, gaming accessories, and fitness gear, 
-                we carefully select each item in our catalog to ensure it meets our rigorous standards for 
-                excellence and reliability.
-              </p>
+              <h2 className="text-3xl md:text-4xl font-bold text-charcoal">
+                {aboutSection?.missionTitle || "Our Mission"}
+              </h2>
+              {aboutSection?.missionContent ? (
+                <div className="text-lg text-gray-600 leading-relaxed whitespace-pre-line">
+                  {aboutSection.missionContent}
+                </div>
+              ) : (
+                <>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    At Innovora, we believe that quality products should be accessible to everyone. Our mission is to 
+                    curate and provide premium lifestyle products that enhance daily life while maintaining the highest 
+                    standards of quality, sustainability, and customer satisfaction.
+                  </p>
+                  <p className="text-lg text-gray-600 leading-relaxed">
+                    From organic feminine care products to educational toys, gaming accessories, and fitness gear, 
+                    we carefully select each item in our catalog to ensure it meets our rigorous standards for 
+                    excellence and reliability.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -95,9 +122,11 @@ export default function About() {
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">Our Values</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">
+              {aboutSection?.valuesTitle || "Our Values"}
+            </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              The principles that guide everything we do at Innovora
+              {aboutSection?.valuesSubtitle || "The principles that guide everything we do at Innovora"}
             </p>
           </div>
 
@@ -157,27 +186,37 @@ export default function About() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">Our Impact</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-4">
+              {aboutSection?.statsTitle || "Our Impact"}
+            </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Numbers that reflect our commitment to excellence and customer satisfaction
+              {aboutSection?.statsSubtitle || "Numbers that reflect our commitment to excellence and customer satisfaction"}
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-customers">10,000+</div>
+              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-customers">
+                {aboutSection?.statsCustomers || "10,000+"}
+              </div>
               <div className="text-gray-600">Happy Customers</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-products">500+</div>
+              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-products">
+                {aboutSection?.statsProducts || "500+"}
+              </div>
               <div className="text-gray-600">Premium Products</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-countries">25+</div>
+              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-countries">
+                {aboutSection?.statsCountries || "25+"}
+              </div>
               <div className="text-gray-600">Countries Served</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-satisfaction">99%</div>
+              <div className="text-4xl font-bold text-charcoal mb-2" data-testid="text-stat-satisfaction">
+                {aboutSection?.statsSatisfaction || "99%"}
+              </div>
               <div className="text-gray-600">Customer Satisfaction</div>
             </div>
           </div>
@@ -189,33 +228,43 @@ export default function About() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-6">Our Story</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-charcoal mb-6">
+                {aboutSection?.storyTitle || "Our Story"}
+              </h2>
             </div>
             
             <div className="space-y-8 text-lg text-gray-600 leading-relaxed">
-              <p>
-                Innovora was founded in 2020 with a simple yet powerful vision: to make premium lifestyle products 
-                accessible to families everywhere. What started as a small e-commerce venture has grown into a 
-                trusted brand serving thousands of customers across multiple countries.
-              </p>
-              
-              <p>
-                Our founder recognized a gap in the market for truly diverse, high-quality products that could meet 
-                the varied needs of modern families. From organic feminine care products to educational toys, gaming 
-                accessories, and fitness equipment, we saw an opportunity to curate a collection that would serve 
-                every member of the family.
-              </p>
-              
-              <p>
-                Today, we continue to expand our catalog while maintaining our commitment to quality, sustainability, 
-                and customer satisfaction. Every product we add goes through rigorous testing and evaluation to ensure 
-                it meets our high standards and provides real value to our customers.
-              </p>
-              
-              <p>
-                As we look to the future, we remain committed to our core values and our mission to enhance lives 
-                through exceptional products and service. Thank you for being part of the Innovora family.
-              </p>
+              {aboutSection?.storyContent ? (
+                <div className="whitespace-pre-line">
+                  {aboutSection.storyContent}
+                </div>
+              ) : (
+                <>
+                  <p>
+                    Innovora was founded in 2020 with a simple yet powerful vision: to make premium lifestyle products 
+                    accessible to families everywhere. What started as a small e-commerce venture has grown into a 
+                    trusted brand serving thousands of customers across multiple countries.
+                  </p>
+                  
+                  <p>
+                    Our founder recognized a gap in the market for truly diverse, high-quality products that could meet 
+                    the varied needs of modern families. From organic feminine care products to educational toys, gaming 
+                    accessories, and fitness equipment, we saw an opportunity to curate a collection that would serve 
+                    every member of the family.
+                  </p>
+                  
+                  <p>
+                    Today, we continue to expand our catalog while maintaining our commitment to quality, sustainability, 
+                    and customer satisfaction. Every product we add goes through rigorous testing and evaluation to ensure 
+                    it meets our high standards and provides real value to our customers.
+                  </p>
+                  
+                  <p>
+                    As we look to the future, we remain committed to our core values and our mission to enhance lives 
+                    through exceptional products and service. Thank you for being part of the Innovora family.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
