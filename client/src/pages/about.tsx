@@ -1,17 +1,57 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Award, Leaf, Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
+interface AboutSection {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  updated_at: string;
+}
 
 export default function About() {
+  const [aboutSection, setAboutSection] = useState<AboutSection | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAboutSection = async () => {
+      try {
+        const response = await fetch('/api/about');
+        if (response.ok) {
+          const data = await response.json();
+          setAboutSection(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch about section:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAboutSection();
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-warm-beige py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold text-charcoal mb-6">About Innovora</h1>
-            <p className="text-xl text-gray-600 leading-relaxed">
-              Enhancing lives through carefully curated, premium products that meet the diverse needs of modern families.
-            </p>
+            {loading ? (
+              <div className="animate-pulse">
+                <div className="h-12 bg-gray-300 rounded mb-6"></div>
+                <div className="h-6 bg-gray-300 rounded"></div>
+              </div>
+            ) : (
+              <>
+                <h1 className="text-4xl md:text-5xl font-bold text-charcoal mb-6">
+                  {aboutSection?.title || "About Innovora"}
+                </h1>
+                <p className="text-xl text-gray-600 leading-relaxed">
+                  {aboutSection?.description || "Enhancing lives through carefully curated, premium products that meet the diverse needs of modern families."}
+                </p>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -21,12 +61,18 @@ export default function About() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <img
-                src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"
-                alt="Our team working together in a modern office"
-                className="rounded-2xl shadow-lg w-full h-auto"
-                data-testid="img-mission"
-              />
+              {loading ? (
+                <div className="animate-pulse">
+                  <div className="bg-gray-300 rounded-2xl w-full h-96"></div>
+                </div>
+              ) : (
+                <img
+                  src={aboutSection?.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600"}
+                  alt="About Innovora"
+                  className="rounded-2xl shadow-lg w-full h-auto"
+                  data-testid="img-mission"
+                />
+              )}
             </div>
             <div className="space-y-6">
               <h2 className="text-3xl md:text-4xl font-bold text-charcoal">Our Mission</h2>

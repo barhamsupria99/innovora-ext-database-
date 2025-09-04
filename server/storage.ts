@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Product, type InsertProduct, type Category, type InsertCategory, products, categories, users } from "@shared/schema";
+import { type User, type InsertUser, type Product, type InsertProduct, type Category, type InsertCategory, type AboutSection, type InsertAboutSection, products, categories, users, aboutSection } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { neon } from "@neondatabase/serverless";
@@ -18,23 +18,31 @@ export interface IStorage {
   getProduct(id: string): Promise<Product | undefined>;
   getProductsByCategory(category: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product>;
+  deleteProduct(id: string): Promise<boolean>;
   searchProducts(query: string): Promise<Product[]>;
   
   // Categories
   getCategories(): Promise<Category[]>;
   getCategory(slug: string): Promise<Category | undefined>;
   createCategory(category: InsertCategory): Promise<Category>;
+  
+  // About Section
+  getAboutSection(): Promise<AboutSection | undefined>;
+  updateAboutSection(about: InsertAboutSection): Promise<AboutSection>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private products: Map<string, Product>;
   private categories: Map<string, Category>;
+  private aboutSection: AboutSection | undefined;
 
   constructor() {
     this.users = new Map();
     this.products = new Map();
     this.categories = new Map();
+    this.aboutSection = undefined;
     this.seedData();
   }
 
@@ -202,6 +210,28 @@ export class MemStorage implements IStorage {
     return product;
   }
 
+  async updateProduct(id: string, updateData: Partial<InsertProduct>): Promise<Product> {
+    const existingProduct = this.products.get(id);
+    if (!existingProduct) {
+      throw new Error("Product not found");
+    }
+    
+    const updatedProduct: Product = {
+      ...existingProduct,
+      ...updateData,
+      id, // Ensure ID doesn't change
+      inStock: updateData.inStock ?? existingProduct.inStock,
+      features: updateData.features ?? existingProduct.features
+    };
+    
+    this.products.set(id, updatedProduct);
+    return updatedProduct;
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    return this.products.delete(id);
+  }
+
   async searchProducts(query: string): Promise<Product[]> {
     const lowerQuery = query.toLowerCase();
     return Array.from(this.products.values()).filter(
@@ -228,10 +258,26 @@ export class MemStorage implements IStorage {
     this.categories.set(id, category);
     return category;
   }
+
+  async getAboutSection(): Promise<AboutSection | undefined> {
+    return this.aboutSection;
+  }
+
+  async updateAboutSection(insertAbout: InsertAboutSection): Promise<AboutSection> {
+    const id = this.aboutSection?.id || randomUUID();
+    const about: AboutSection = { 
+      ...insertAbout, 
+      id,
+      updatedAt: new Date().toISOString()
+    };
+    this.aboutSection = about;
+    return about;
+  }
 }
 
 export class DatabaseStorage implements IStorage {
   private db;
+  private sql;
 
   constructor() {
     if (!process.env.DATABASE_URL) {
@@ -242,8 +288,14 @@ export class DatabaseStorage implements IStorage {
       console.log("🔌 Initializing database connection...");
       console.log("DATABASE_URL:", process.env.DATABASE_URL ? "✅ Set" : "❌ Not set");
       
-      const sql = neon(process.env.DATABASE_URL);
-      this.db = drizzle(sql);
+      // Initialize the raw SQL client for fallback
+      this.sql = neon(process.env.DATABASE_URL);
+      
+      // Initialize Drizzle with proper configuration
+      this.db = drizzle(this.sql, {
+        schema: { products, categories, aboutSection }
+      });
+      
       console.log("✅ Database connection initialized successfully");
     } catch (error) {
       console.error("❌ Failed to initialize database connection:", error);
@@ -270,22 +322,25 @@ export class DatabaseStorage implements IStorage {
 
   async getProducts(): Promise<Product[]> {
     try {
-      console.log("🔍 Fetching products from database...");
-      
       // First try with Drizzle ORM
       try {
         const result = await this.db.select().from(products);
-        console.log(`✅ Successfully fetched ${result.length} products with Drizzle`);
         return result;
       } catch (drizzleError) {
-        console.log("⚠️ Drizzle query failed, trying raw SQL...");
-        console.error("Drizzle error:", drizzleError);
-        
         // Fallback to raw SQL
-        const sql = neon(process.env.DATABASE_URL!);
-        const result = await sql`SELECT * FROM products`;
-        console.log(`✅ Successfully fetched ${result.length} products with raw SQL`);
-        return result as Product[];
+        const result = await this.sql`
+          SELECT 
+            id,
+            name,
+            description,
+            price,
+            category,
+            image,
+            in_stock as "inStock",
+            features
+          FROM products
+        ` as Product[];
+        return result;
       }
     } catch (error) {
       console.error("❌ Error fetching products:", error);
@@ -294,8 +349,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProduct(id: string): Promise<Product | undefined> {
-    const result = await this.db.select().from(products).where(eq(products.id, id)).limit(1);
-    return result[0];
+    try {
+      const result = await this.db.select().from(products).where(eq(products.id, id)).limit(1);
+      return result[0];
+    } catch (drizzleError) {
+      // Fallback to raw SQL
+      const result = await this.sql`
+        SELECT 
+          id,
+          name,
+          description,
+          price,
+          category,
+          image,
+          in_stock as "inStock",
+          features
+        FROM products 
+        WHERE id = ${id} 
+        LIMIT 1
+      ` as Product[];
+      return result[0];
+    }
   }
 
   async getProductsByCategory(category: string): Promise<Product[]> {
@@ -314,6 +388,60 @@ export class DatabaseStorage implements IStorage {
     return newProduct;
   }
 
+  async updateProduct(id: string, updateData: Partial<InsertProduct>): Promise<Product> {
+    const existingProduct = await this.getProduct(id);
+    if (!existingProduct) {
+      throw new Error("Product not found");
+    }
+    
+    const updatedProduct = {
+      id: existingProduct.id,
+      name: updateData.name ?? existingProduct.name,
+      description: updateData.description ?? existingProduct.description,
+      price: updateData.price ?? existingProduct.price,
+      category: updateData.category ?? existingProduct.category,
+      image: updateData.image ?? existingProduct.image,
+      inStock: updateData.inStock ?? existingProduct.inStock,
+      features: updateData.features ?? existingProduct.features
+    };
+    
+    try {
+      await this.db.update(products)
+        .set({
+          name: updatedProduct.name,
+          description: updatedProduct.description,
+          price: updatedProduct.price,
+          category: updatedProduct.category,
+          image: updatedProduct.image,
+          inStock: updatedProduct.inStock,
+          features: updatedProduct.features
+        })
+        .where(eq(products.id, id));
+    } catch (drizzleError) {
+      // Fallback to raw SQL
+      await this.sql`
+        UPDATE products 
+        SET name = ${updatedProduct.name}, 
+            description = ${updatedProduct.description}, 
+            price = ${updatedProduct.price}, 
+            category = ${updatedProduct.category}, 
+            image = ${updatedProduct.image}, 
+            in_stock = ${updatedProduct.inStock}, 
+            features = ${JSON.stringify(updatedProduct.features)}
+        WHERE id = ${id}
+      `;
+    }
+    
+    // Fetch and return the updated product from database
+    const finalProduct = await this.getProduct(id);
+    return finalProduct!;
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    const result = await this.db.delete(products).where(eq(products.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
   async searchProducts(query: string): Promise<Product[]> {
     const searchTerm = `%${query.toLowerCase()}%`;
     return await this.db.select().from(products).where(
@@ -327,21 +455,21 @@ export class DatabaseStorage implements IStorage {
 
   async getCategories(): Promise<Category[]> {
     try {
-      console.log("🔍 Fetching categories from database...");
-      
       // First try with Drizzle ORM
       try {
         const result = await this.db.select().from(categories);
-        console.log(`✅ Successfully fetched ${result.length} categories with Drizzle`);
         return result;
       } catch (drizzleError) {
-        console.log("⚠️ Drizzle query failed, trying raw SQL...");
-        console.error("Drizzle error:", drizzleError);
-        
         // Fallback to raw SQL
-        const sql = neon(process.env.DATABASE_URL!);
-        const result = await sql`SELECT * FROM categories`;
-        console.log(`✅ Successfully fetched ${result.length} categories with raw SQL`);
+        const result = await this.sql`
+          SELECT 
+            id,
+            name,
+            slug,
+            description,
+            image
+          FROM categories
+        ` as Category[];
         return result as Category[];
       }
     } catch (error) {
@@ -360,6 +488,77 @@ export class DatabaseStorage implements IStorage {
     const newCategory = { ...insertCategory, id };
     await this.db.insert(categories).values(newCategory);
     return newCategory;
+  }
+
+  async getAboutSection(): Promise<AboutSection | undefined> {
+    try {
+      // First try with Drizzle ORM
+      try {
+        const result = await this.db.select().from(aboutSection).limit(1);
+        return result[0];
+      } catch (drizzleError) {
+        // Fallback to raw SQL
+        const result = await this.sql`SELECT * FROM about_section LIMIT 1` as AboutSection[];
+        return result[0];
+      }
+    } catch (error) {
+      console.error("❌ Error fetching about section:", error);
+      return undefined;
+    }
+  }
+
+  async updateAboutSection(insertAbout: InsertAboutSection): Promise<AboutSection> {
+    const existingAbout = await this.getAboutSection();
+    
+    try {
+      if (existingAbout) {
+        // Update existing
+        const updatedAbout = {
+          ...existingAbout,
+          ...insertAbout,
+          updatedAt: new Date().toISOString()
+        };
+        
+        try {
+          await this.db.update(aboutSection)
+            .set(updatedAbout)
+            .where(eq(aboutSection.id, existingAbout.id));
+        } catch (drizzleError) {
+          await this.sql`
+            UPDATE about_section 
+            SET title = ${updatedAbout.title}, 
+                description = ${updatedAbout.description}, 
+                image = ${updatedAbout.image}, 
+                updated_at = ${updatedAbout.updatedAt}
+            WHERE id = ${updatedAbout.id}
+          `;
+        }
+        
+        return updatedAbout;
+      } else {
+        // Create new
+        const id = randomUUID();
+        const newAbout = {
+          ...insertAbout,
+          id,
+          updatedAt: new Date().toISOString()
+        };
+        
+        try {
+          await this.db.insert(aboutSection).values(newAbout);
+        } catch (drizzleError) {
+          await this.sql`
+            INSERT INTO about_section (id, title, description, image, updated_at)
+            VALUES (${newAbout.id}, ${newAbout.title}, ${newAbout.description}, ${newAbout.image}, ${newAbout.updatedAt})
+          `;
+        }
+        
+        return newAbout;
+      }
+    } catch (error) {
+      console.error("❌ Error updating about section:", error);
+      throw error;
+    }
   }
 }
 
