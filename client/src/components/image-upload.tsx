@@ -27,8 +27,7 @@ export const ImageUpload = ({
   const { toast } = useToast();
   
   // Configurable file size limit
-  const sizeMB = process.env.MAX_IMAGE_SIZE_MB;
-  const maxSizeMB = sizeMB;
+  const maxSizeMB = 5;
 
   // Update preview when value prop changes
   useEffect(() => {

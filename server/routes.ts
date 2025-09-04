@@ -101,6 +101,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new category (Admin)
+  app.post("/api/admin/categories", async (req, res) => {
+    try {
+      console.log("Received category creation request:", req.body);
+      
+      const categorySchema = z.object({
+        name: z.string().min(1, "Category name is required"),
+        slug: z.string().min(1, "Category slug is required"),
+        description: z.string().optional().default(""),
+        image: z.string().optional().default("")
+      });
+      
+      const categoryData = categorySchema.parse(req.body);
+      console.log("Validated category data:", categoryData);
+      
+      const category = await storage.createCategory(categoryData);
+      console.log("Successfully created category:", category);
+      
+      res.status(201).json(category);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      console.error("Full error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : undefined
+      });
+      res.status(500).json({ 
+        message: "Failed to create category",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
+    }
+  });
+
   // Newsletter subscription endpoint
   app.post("/api/newsletter", async (req, res) => {
     try {

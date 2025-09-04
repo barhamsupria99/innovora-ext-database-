@@ -52,6 +52,8 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCreateCategoryDialogOpen, setIsCreateCategoryDialogOpen] = useState(false);
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   
   const [formData, setFormData] = useState({
@@ -68,6 +70,13 @@ const AdminPage = () => {
   
   const [aboutFormData, setAboutFormData] = useState({
     title: "",
+    description: "",
+    image: ""
+  });
+
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: "",
+    slug: "",
     description: "",
     image: ""
   });
@@ -332,6 +341,101 @@ const AdminPage = () => {
     }
   };
 
+  const handleCreateCategory = async () => {
+    try {
+      setIsCreatingCategory(true);
+      
+      // Validate required fields
+      if (!categoryFormData.name.trim()) {
+        toast({
+          title: "Error",
+          description: "Category name is required",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Generate slug from name if not provided
+      const slug = categoryFormData.slug.trim() || 
+        categoryFormData.name.toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+          .replace(/\s+/g, '-') // Replace spaces with hyphens
+          .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+          .replace(/(^-|-$)/g, ''); // Remove leading/trailing hyphens
+      
+      // Validate that we have a valid slug
+      if (!slug || slug.length === 0) {
+        toast({
+          title: "Error",
+          description: "Could not generate a valid slug from the category name",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Check if slug already exists
+      const existingCategory = categories.find(cat => cat.slug === slug);
+      if (existingCategory) {
+        toast({
+          title: "Error",
+          description: `A category with slug "${slug}" already exists`,
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const response = await fetch("/api/admin/categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ...categoryFormData,
+          slug
+        })
+      });
+
+      if (response.ok) {
+        const newCategory = await response.json();
+        // Immediately add the new category to the list
+        setCategories(prevCategories => [...prevCategories, newCategory]);
+        // Automatically select the new category in the product form
+        setFormData(prevFormData => ({ ...prevFormData, category: newCategory.slug }));
+        setIsCreateCategoryDialogOpen(false);
+        resetCategoryForm();
+        toast({
+          title: "Success",
+          description: "Category created successfully and selected"
+        });
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create category",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Category creation error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create category",
+        variant: "destructive"
+      });
+    } finally {
+      setIsCreatingCategory(false);
+    }
+  };
+
+  const resetCategoryForm = () => {
+    setCategoryFormData({
+      name: "",
+      slug: "",
+      description: "",
+      image: ""
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
@@ -423,18 +527,29 @@ const AdminPage = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="category">Category</Label>
-                        <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.slug}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="flex gap-2">
+                          <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                            <SelectTrigger className="flex-1">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categories.map((category) => (
+                                <SelectItem key={category.id} value={category.slug}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsCreateCategoryDialogOpen(true)}
+                            className="px-3"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                       <div>
                         <Label htmlFor="inStock">Stock Quantity</Label>
@@ -755,18 +870,29 @@ const AdminPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="edit-category">Category</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.slug}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.slug}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsCreateCategoryDialogOpen(true)}
+                      className="px-3"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="edit-inStock">Stock Quantity</Label>
@@ -820,6 +946,71 @@ const AdminPage = () => {
                 Cancel
               </Button>
               <Button onClick={handleUpdateProduct}>Update Product</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Category Dialog */}
+        <Dialog open={isCreateCategoryDialogOpen} onOpenChange={setIsCreateCategoryDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Create New Category</DialogTitle>
+              <DialogDescription>
+                Add a new category for your products
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div>
+                <Label htmlFor="category-name">Category Name *</Label>
+                <Input
+                  id="category-name"
+                  value={categoryFormData.name}
+                  onChange={(e) => setCategoryFormData({ ...categoryFormData, name: e.target.value })}
+                  placeholder="Enter category name"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="category-slug">Slug (optional)</Label>
+                <Input
+                  id="category-slug"
+                  value={categoryFormData.slug}
+                  onChange={(e) => setCategoryFormData({ ...categoryFormData, slug: e.target.value })}
+                  placeholder="Auto-generated from name"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  URL-friendly version (e.g., "women-clothing")
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="category-description">Description (optional)</Label>
+                <Textarea
+                  id="category-description"
+                  value={categoryFormData.description}
+                  onChange={(e) => setCategoryFormData({ ...categoryFormData, description: e.target.value })}
+                  placeholder="Enter category description"
+                  rows={3}
+                />
+              </div>
+              <div>
+                <ImageUpload
+                  value={categoryFormData.image}
+                  onChange={(url) => setCategoryFormData({ ...categoryFormData, image: url })}
+                  folder="categories"
+                  label="Category Image (optional)"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsCreateCategoryDialogOpen(false)} disabled={isCreatingCategory}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleCreateCategory} 
+                disabled={isCreatingCategory || !categoryFormData.name.trim()}
+              >
+                {isCreatingCategory ? "Creating..." : "Create Category"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
