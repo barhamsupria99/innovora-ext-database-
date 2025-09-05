@@ -22,7 +22,11 @@ export default function Cart() {
               <h3 className="text-xl font-semibold text-gray-600 mb-2">Your cart is empty</h3>
               <p className="text-gray-500 mb-6">Add some amazing products to get started!</p>
               <Link href="/products">
-                <Button className="bg-charcoal hover:bg-deep-charcoal" data-testid="button-start-shopping">
+                <Button 
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-semibold" 
+                  style={{ backgroundColor: 'hsl(210 25% 7.8431%)' }}
+                  data-testid="button-start-shopping"
+                >
                   Start Shopping
                 </Button>
               </Link>
@@ -57,6 +61,7 @@ export default function Cart() {
           <Button 
             variant="outline" 
             onClick={handleClearCart}
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
             data-testid="button-clear-cart"
           >
             Clear Cart
@@ -183,7 +188,8 @@ export default function Cart() {
                 )}
 
                 <Button 
-                  className="w-full bg-charcoal hover:bg-deep-charcoal"
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold"
+                  style={{ backgroundColor: 'hsl(210 25% 7.8431%)' }}
                   size="lg"
                   onClick={handleCheckout}
                   data-testid="button-checkout"
@@ -192,7 +198,11 @@ export default function Cart() {
                 </Button>
 
                 <Link href="/products" className="block">
-                  <Button variant="outline" className="w-full" data-testid="button-continue-shopping">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 font-medium" 
+                    data-testid="button-continue-shopping"
+                  >
                     Continue Shopping
                   </Button>
                 </Link>

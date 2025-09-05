@@ -29,8 +29,8 @@ Preferred communication style: Simple, everyday language.
 ## Data Storage Solutions
 - **Database**: PostgreSQL with Drizzle ORM for type-safe database operations
 - **Schema Management**: Drizzle Kit for migrations and schema management
-- **In-Memory Fallback**: MemStorage class for development/testing with seeded data
 - **Connection**: Neon Database serverless PostgreSQL for production
+- **Requirement**: DATABASE_URL environment variable is required for application startup
 
 ## Development and Build Tools
 - **Development Server**: Vite dev server integrated with Express backend
