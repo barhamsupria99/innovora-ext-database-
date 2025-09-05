@@ -22,28 +22,34 @@ export default function Products() {
   const searchParam = params.get('search');
 
   const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
-    queryKey: ['/api/products', categoryFilter || ''],
+    queryKey: ['products', categoryFilter || 'all', searchParam || ''],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (categoryFilter) params.append('category', categoryFilter);
+      if (searchParam) params.append('search', searchParam);
+      
+      const url = `/api/products${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch products');
+      return response.json();
+    },
   });
 
   const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ['/api/categories'],
+    queryFn: async () => {
+      const response = await fetch('/api/categories');
+      if (!response.ok) throw new Error('Failed to fetch categories');
+      return response.json();
+    },
   });
 
-  // Filter and search products
+  // Sort products (filtering and searching handled by API)
   const filteredProducts = useMemo(() => {
-    let filtered = products;
-
-    // Apply search
-    const query = searchParam || searchQuery;
-    if (query) {
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(query.toLowerCase()) ||
-        product.description.toLowerCase().includes(query.toLowerCase())
-      );
-    }
+    const sorted = [...products];
 
     // Sort products
-    filtered.sort((a, b) => {
+    sorted.sort((a, b) => {
       switch (sortBy) {
         case 'price-low':
           return parseFloat(a.price) - parseFloat(b.price);
@@ -55,13 +61,14 @@ export default function Products() {
       }
     });
 
-    return filtered;
-  }, [products, searchQuery, searchParam, sortBy]);
+    return sorted;
+  }, [products, sortBy, location]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       setLocation(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery(''); // Clear the search input
     }
   };
 
@@ -71,6 +78,8 @@ export default function Products() {
     } else {
       setLocation(`/products?category=${category}`);
     }
+    // Clear search when changing category
+    setSearchQuery('');
   };
 
   const getCurrentCategory = () => {
@@ -91,6 +100,21 @@ export default function Products() {
           {currentCategory && (
             <p className="text-lg text-gray-600">{currentCategory.description}</p>
           )}
+          {categoryFilter && (
+            <div className="mt-2 flex items-center gap-2">
+              <Badge variant="secondary" className="text-sm">
+                Filtered by: {currentCategory?.name || categoryFilter}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation('/products')}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                Clear Filter
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Filters and Search */}
@@ -103,7 +127,7 @@ export default function Products() {
                   <Input
                     type="text"
                     placeholder="Search products..."
-                    value={searchQuery}
+                    value={searchParam || searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1"
                     data-testid="input-product-search"

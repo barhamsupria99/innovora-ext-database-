@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, ShoppingCart } from 'lucide-react';
@@ -73,7 +74,7 @@ export default function Home() {
                   <Button 
                     variant="outline" 
                     size="lg" 
-                    className="border-charcoal text-charcoal hover:bg-charcoal hover:text-white w-full sm:w-auto"
+                    className="border-gray-700 text-gray-700 hover:bg-slate-900 hover:text-white w-full sm:w-auto font-medium transition-colors duration-200"
                     data-testid="button-learn-more"
                   >
                     Learn More

@@ -185,7 +185,8 @@ export default function ProductDetail() {
               ) : (
                 <Button 
                   onClick={handleAddToCart}
-                  className="w-full bg-charcoal hover:bg-deep-charcoal"
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold"
+                  style={{ backgroundColor: 'hsl(210 25% 7.8431%)' }}
                   size="lg"
                   data-testid="button-add-to-cart"
                 >
